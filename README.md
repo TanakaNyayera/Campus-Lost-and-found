@@ -80,15 +80,6 @@ You can also override sensitive values with environment variables:
 
 See `.env.example` and `config/config.example.yaml` for safe placeholder values.
 
-## Screenshots
-
-Recommended screenshots for the GitHub repository:
-
-- Login and registration pages
-- Student dashboard
-- Lost item reporting form
-- Admin dashboard
-- Support chat and admin chat views
 
 ## GitHub Notes
 
