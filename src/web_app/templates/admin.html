@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — MSU Lost & Found{% endblock %}
+{% block extra_css %}
+<style>
+    main { max-width: 1500px; width: 96%; }
+    .gateway-note { color:#666; font-size:.9rem; margin-bottom:16px; line-height:1.5; }
+    .gateway-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; }
+    .gateway-report { display:grid; gap:8px; min-width:260px; }
+    .admin-table-wrap { overflow-x:auto; width:100%; }
+    .admin-table-wrap table { min-width:980px; }
+    .gateway-report textarea {
+        width:100%;
+        min-height:64px;
+        padding:10px;
+        border:1px solid #e0e7ef;
+        border-radius:8px;
+        font-family:'DM Sans',sans-serif;
+        font-size:.85rem;
+    }
+    .gateway-report .report-buttons { display:flex; gap:8px; flex-wrap:wrap; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Admin Dashboard</h1>
+    <p>Manage all lost and found items, matches, and claims.</p>
+</div>
+
+<!-- Stats -->
+<div class="grid-4" style="margin-bottom:30px;">
+    <div class="stat-card">
+        <div class="number">{{ total_users }}</div>
+        <div class="label">Registered Users</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ total_lost }}</div>
+        <div class="label">Lost Items Reported</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ total_found }}</div>
+        <div class="label">Found Items Reported</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ total_matches }}</div>
+        <div class="label">Total Matches</div>
+    </div>
+</div>
+
+<!-- Quick Action -->
+<div style="margin-bottom:24px;">
+    <a href="/report_found" class="btn btn-gold">+ Report Found Item</a>
+</div>
+
+<!-- Handling Gateway -->
+<div class="card">
+    <div class="card-title">Handling Gateway</div>
+    <p class="gateway-note">
+        Approved claims become return tasks here. Agents can accept a task, report successful delivery,
+        or report a failed delivery attempt. Successful delivery sends the student an email to confirm receipt.
+    </p>
+    {% if handling_tasks %}
+    <div class="admin-table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Claimant</th>
+                <th>Item</th>
+                <th>Destination</th>
+                <th>Agent</th>
+                <th>Status</th>
+                <th>Last Report</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for task in handling_tasks %}
+            <tr>
+                <td>
+                    <strong>{{ task.claimant_name }}</strong><br>
+                    <small>{{ task.claimant_email }}</small>
+                </td>
+                <td>
+                    <strong>{{ task.found_name }}</strong><br>
+                    <small>Matched to: {{ task.lost_name }}</small>
+                </td>
+                <td>{{ task.destination or 'MSU Lost & Found Office' }}</td>
+                <td>{{ task.agent_name or 'Unassigned' }}</td>
+                <td>
+                    <span class="badge badge-{{
+                        'warning' if task.status in ['pending','accepted'] else
+                        'success' if task.status in ['delivered','user_confirmed'] else
+                        'danger' if task.status in ['failed','user_disputed'] else
+                        'info'
+                    }}">
+                        {{ task.status.replace('_', ' ').title() }}
+                    </span>
+                </td>
+                <td style="max-width:220px;">
+                    <small>{{ task.agent_report or 'No report yet' }}</small>
+                </td>
+                <td>
+                    <div class="gateway-actions">
+                        {% if task.status in ['pending','failed'] %}
+                        <form method="POST" action="/admin/handling/{{ task.id }}/accept">
+                            <button class="btn btn-sm btn-gold" type="submit">Accept Task</button>
+                        </form>
+                        {% endif %}
+
+                        {% if task.status in ['pending','accepted','failed'] %}
+                        <form class="gateway-report" method="POST" action="/admin/handling/{{ task.id }}/report">
+                            <textarea name="agent_report" placeholder="Agent delivery report..." required></textarea>
+                            <div class="report-buttons">
+                                <button class="btn btn-sm btn-success" type="submit" name="outcome" value="delivered">
+                                    Delivered
+                                </button>
+                                <button class="btn btn-sm btn-danger" type="submit" name="outcome" value="failed">
+                                    Failed
+                                </button>
+                            </div>
+                        </form>
+                        {% else %}
+                        <small style="color:#666;">Process closed or waiting for user confirmation.</small>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:35px; color:#666;">
+        <p>No handling tasks yet. Approve a claim to create one.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Recent Lost Item Reports -->
+<div class="card">
+    <div class="card-title">Recent Lost Item Reports (Student Details)</div>
+    {% if recent_lost %}
+    <div class="admin-table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Student ID</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Location</th>
+                <th>Date Lost</th>
+                <th>Status</th>
+                <th>Image</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in recent_lost %}
+            <tr>
+                <td><strong>{{ item.full_name }}</strong></td>
+                <td>{{ item.student_id or 'N/A' }}</td>
+                <td>{{ item.email }}</td>
+                <td>{{ item.phone or 'N/A' }}</td>
+                <td><strong>{{ item.item_name }}</strong></td>
+                <td>{{ item.category }}</td>
+                <td style="max-width:200px;"><small>{{ item.description[:80] }}...</small></td>
+                <td>{{ item.location_lost or 'N/A' }}</td>
+                <td>{{ item.date_lost or 'N/A' }}</td>
+                <td>
+                    <span class="badge badge-{{ 'success' if item.status == 'matched' else 'warning' if item.status == 'unmatched' else 'info' }}">
+                        {{ item.status.title() }}
+                    </span>
+                </td>
+                <td>
+                    {% if item.image_path %}
+                    <a href="/uploaded/{{ item.image_path }}" target="_blank">
+                        <img src="/uploaded/{{ item.image_path }}"
+                             style="width:50px; height:50px; object-fit:cover; border-radius:6px;">
+                    </a>
+                    {% else %}
+                    <small style="color:#888;">No image</small>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:40px; color:#666;">
+        <div style="font-size:3rem; margin-bottom:12px;">📋</div>
+        <p>No lost item reports yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Pending Claims -->
+
+<!-- Admin Chat -->
+<div class="card" style="margin-top:24px;">
+    <div class="card-title">Live Support Chat</div>
+    <p style="color:#666; margin-bottom:18px;">Reply to each user inside the WhatsApp-like chat thread.</p>
+    <a href="/admin/chat" class="btn btn-gold">Open Chat</a>
+</div>
+
+
+<div class="card">
+    <div class="card-title">Pending Claims ({{ pending_claims|length }})</div>
+    {% if pending_claims %}
+    <div class="admin-table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Claimant</th>
+                <th>Email</th>
+                <th>Lost Item</th>
+                <th>Found Item</th>
+                <th>Proof Details</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for claim in pending_claims %}
+            <tr>
+                <td><strong>{{ claim.full_name }}</strong></td>
+                <td>{{ claim.email }}</td>
+                <td>{{ claim.lost_name }}</td>
+                <td>{{ claim.found_name }}</td>
+                <td style="max-width:200px;">
+                    <small>{{ claim.proof_details[:80] if claim.proof_details else 'N/A' }}...</small>
+                </td>
+                <td>{{ claim.created_at.strftime('%d %b %Y') if claim.created_at else 'N/A' }}</td>
+                <td>
+                    <a href="/admin/claim/{{ claim.id }}/approve"
+                       class="btn btn-sm btn-success"
+                       onclick="return confirm('Approve this claim?')">Approve</a>
+                    &nbsp;
+                    <a href="/admin/claim/{{ claim.id }}/reject"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Reject this claim?')">Reject</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <div style="text-align:center; padding:40px; color:#666;">
+        <div style="font-size:3rem; margin-bottom:12px;">✅</div>
+        <p>No pending claims at the moment.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

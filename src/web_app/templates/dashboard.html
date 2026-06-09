@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — MSU Lost & Found{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Floating WhatsApp-like chat button */
+  .chat-float{
+    position: fixed;
+    right: 24px;
+    bottom: 28px;
+    z-index: 999;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #25D366;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-decoration:none;
+    color:white;
+    font-size: 24px;
+    transition: transform .15s ease;
+  }
+  .chat-float:hover{ transform: translateY(-2px); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="page-header">
+    <h1>Welcome, {{ session.user_name }}! 👋</h1>
+    <p>Manage your lost and found item reports from your dashboard.</p>
+</div>
+
+<!-- Stats -->
+<div class="grid-4" style="margin-bottom:30px;">
+    <div class="stat-card">
+        <div class="number">{{ lost_count }}</div>
+        <div class="label">Lost Items Reported</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ found_count }}</div>
+        <div class="label">Found Items Reported</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">{{ recent_matches|length }}</div>
+        <div class="label">Recent Matches</div>
+    </div>
+    {% if session.role == 'admin' %}
+    <div class="stat-card">
+        <div class="number">94.4%</div>
+        <div class="label">System Accuracy</div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Quick Actions -->
+<div class="grid-2" style="margin-bottom:30px;">
+    <div class="card" style="text-align:center; border-top: 4px solid var(--danger);">
+        <div style="font-size:3rem; margin-bottom:12px;">😔</div>
+        <h3 style="font-family:'Playfair Display',serif; color:var(--navy); margin-bottom:10px;">Lost Something?</h3>
+        <p style="color:#666; margin-bottom:20px; font-size:0.9rem;">Report your lost item and our AI will search for a match instantly.</p>
+        <a href="/report_lost" class="btn btn-primary">Report Lost Item</a>
+    </div>
+    {% if session.role == 'admin' %}
+        <div class="card" style="text-align:center; border-top: 4px solid var(--success);">
+        <div style="font-size:3rem; margin-bottom:12px;">😊</div>
+        <h3 style="font-family:'Playfair Display',serif; color:var(--navy); margin-bottom:10px;">Found Something?</h3>
+        <p style="color:#666; margin-bottom:20px; font-size:0.9rem;">Report a found item and help reunite it with its owner.</p>
+        <a href="/report_found" class="btn btn-gold">Report Found Item</a>
+    </div>
+    {% else %}
+    <div class="card" style="text-align:center; border-top: 4px solid var(--info);">
+        <div style="font-size:3rem; margin-bottom:12px;">📋</div>
+        <h3 style="font-family:'Playfair Display',serif; color:var(--navy); margin-bottom:10px;">Found Something?</h3>
+        <p style="color:#666; margin-bottom:20px; font-size:0.9rem;">Students report found goods through support chat. Send the item details to an admin so it can be recorded and matched.</p>
+        <a href="/chat" class="btn btn-gold">Chat With Admin</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Lost Item Tracking -->
+<div class="card" style="margin-bottom:30px;">
+    <div class="card-title">Lost Item Tracking</div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:18px;">
+        <div style="background:#fff9e8; border-left:4px solid var(--warning); padding:12px; border-radius:8px;">
+            <strong style="color:var(--navy);">Pending</strong>
+            <p style="margin:6px 0 0; color:#666; font-size:0.86rem;">Your report is active. You will be notified when the item is found.</p>
+        </div>
+        <div style="background:#fff0f0; border-left:4px solid var(--danger); padding:12px; border-radius:8px;">
+            <strong style="color:var(--navy);">Expired Request</strong>
+            <p style="margin:6px 0 0; color:#666; font-size:0.86rem;">The request has stayed open for more than {{ expiry_days }} days and may no longer be valid.</p>
+        </div>
+        <div style="background:#eefaf2; border-left:4px solid var(--success); padding:12px; border-radius:8px;">
+            <strong style="color:var(--navy);">Found</strong>
+            <p style="margin:6px 0 0; color:#666; font-size:0.86rem;">A matching found item was recorded. Go to Matches to submit a claim.</p>
+        </div>
+    </div>
+
+    {% if lost_reports %}
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Category</th>
+                <th>Location Lost</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Instruction</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in lost_reports %}
+            <tr>
+                <td><strong>{{ report.item_name }}</strong><br><small>{{ report.description[:70] }}{% if report.description|length > 70 %}...{% endif %}</small></td>
+                <td>{{ report.category }}</td>
+                <td>{{ report.location_lost or 'N/A' }}</td>
+                <td>{{ report.tracking_date.strftime('%d %b %Y') if report.tracking_date else 'N/A' }}</td>
+                <td>
+                    <span class="badge badge-{{ report.tracking_badge }}">
+                        {{ report.tracking_status }}
+                    </span>
+                </td>
+                <td style="max-width:260px;"><small>{{ report.tracking_note }}</small></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align:center; padding:28px; color:#666;">
+        <p>No lost item reports yet. Report a lost item to start tracking it here.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Recent Matches -->
+<div class="card">
+    <div class="card-title">Recent Matches</div>
+    {% if recent_matches %}
+    <table>
+        <thead>
+            <tr>
+                <th>Lost Item</th>
+                <th>Found Item</th>
+                <th>Match Score</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for match in recent_matches %}
+            <tr>
+                <td><strong>{{ match.lost_name }}</strong></td>
+                <td><strong>{{ match.found_name }}</strong></td>
+                <td>
+                    <strong style="color:var(--success);">
+                        {{ "%.1f"|format(match.hybrid_score * 100) }}%
+                    </strong>
+                </td>
+                <td>
+                    <span class="badge badge-{{ 'success' if match.status == 'confirmed' else 'warning' if match.status == 'pending' else 'danger' }}">
+                        {{ match.status.title() }}
+                    </span>
+                </td>
+                <td>{{ match.matched_at.strftime('%d %b %Y') if match.matched_at else 'N/A' }}</td>
+                <td>
+                    <a href="/claim/{{ match.id }}" class="btn btn-sm btn-gold">Claim</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div style="text-align:center; padding:40px; color:#666;">
+        <div style="font-size:3rem; margin-bottom:12px;">🔍</div>
+        <p>No matches found yet. Report a lost or found item to get started!</p>
+    </div>
+    {% endif %}
+    <div style="margin-top:16px;">
+        <a href="/matches" class="btn btn-primary btn-sm">View All Matches</a>
+    </div>
+</div>
+
+<!-- Floating chat button -->
+<a class="chat-float" href="{% if session.role == 'admin' %}/admin/chat{% else %}/chat{% endif %}" title="Live Support Chat">💬</a>
+
+{% endblock %}

@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% block title %}MSU Lost & Found — Home{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-wrap{
+        width:100%;
+        background: linear-gradient(135deg, var(--navy) 0%, #005599 100%);
+        color:white;
+        margin-bottom:40px;
+        position:relative;
+        overflow:hidden;
+        padding: 0;
+    }
+
+    .hero {
+        color: white;
+        padding: 80px 40px;
+        text-align: center;
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .hero::before {
+        content: '';
+        position: absolute;
+        top: -50px; right: -50px;
+        width: 300px; height: 300px;
+        background: rgba(201,151,58,0.15);
+        border-radius: 50%;
+    }
+
+    .hero h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 3rem;
+        margin-bottom: 16px;
+        position: relative;
+    }
+
+    .hero h1 span { color: var(--gold); }
+
+    .hero p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto 32px;
+        line-height: 1.7;
+    }
+
+    .hero-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+    .feature-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        text-align: center;
+        box-shadow: var(--shadow);
+        transition: transform 0.2s;
+    }
+
+    .feature-card:hover { transform: translateY(-4px); }
+
+    .feature-icon { font-size: 2.5rem; margin-bottom: 16px; }
+
+    .feature-card h3 {
+        font-family: 'Playfair Display', serif;
+        color: var(--navy);
+        margin-bottom: 10px;
+    }
+
+    .feature-card p { color: #666; font-size: 0.9rem; line-height: 1.6; }
+
+    .section-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.8rem;
+        color: var(--navy);
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .section-title span { color: var(--gold); }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-wrap">
+    <div class="hero">
+        <div class="hero-badge">🤝 Hybrid Matching • NLP + Computer Vision</div>
+        <h1>MSU <span>Lost & Found</span> System</h1>
+        <p>A smart system that matches lost and found items using machine learning.
+           Report your lost item and let our hybrid model find it for you.</p>
+
+        <div class="hero-btns">
+            <a href="/report_lost" class="btn btn-gold">Report Lost Item</a>
+            {% if session.role == 'admin' %}
+                <a href="/report_found" class="btn btn-primary" style="background:rgba(255,255,255,0.2); border: 2px solid white;">Report Found Item</a>
+            {% endif %}
+        </div>
+
+        <div class="hero-subnote">
+            Secure login • Instant email updates • Admin verified claims
+        </div>
+    </div>
+</div>
+
+
+<!-- Features -->
+<h2 class="section-title">How It <span>Works</span></h2>
+<div class="grid-3" style="margin-bottom:40px;">
+    <div class="feature-card">
+        <div class="feature-icon">📝</div>
+        <h3>Report Your Item</h3>
+        <p>Submit a description and photo of your lost or found item through our simple form.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>SMART MATCHING</h3>
+        <p>Our hybrid model combines NLP text analysis and computer vision to find the best match.</p>
+    </div>
+
+    <div class="feature-card">
+        <div class="feature-icon">📧</div>
+        <h3>Instant Notification</h3>
+        <p>Get an email notification the moment a match is found for your lost item.</p>
+    </div>
+</div>
+
+<!-- Stats — Admin only -->
+{% if session.role == 'admin' %}
+<h2 class="section-title">System <span>Statistics</span></h2>
+<div class="grid-4">
+    <div class="stat-card">
+        <div class="number">94.4%</div>
+        <div class="label">Matching Accuracy</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">172</div>
+        <div class="label">Items in Dataset</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">14</div>
+        <div class="label">Item Categories</div>
+    </div>
+    <div class="stat-card">
+        <div class="number">0.81</div>
+        <div class="label">Avg Match Score</div>
+    </div>
+</div>
+{% endif %}
+
+{% if not session.user_id %}
+<div class="card" style="text-align:center; margin-top:40px;">
+    <h3 style="font-family:'Playfair Display',serif; color:var(--navy); margin-bottom:12px;">
+        Ready to find your lost item?
+    </h3>
+    <p style="color:#666; margin-bottom:20px;">Create an account to start reporting items and receiving match notifications.</p>
+    <a href="/register" class="btn btn-gold">Create Account</a>
+    &nbsp;&nbsp;
+    <a href="/login" class="btn btn-primary">Login</a>
+</div>
+{% endif %}
+{% endblock %}
+

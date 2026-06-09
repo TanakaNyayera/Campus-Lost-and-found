@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Claim Item — MSU Lost & Found{% endblock %}
+{% block content %}
+<div style="max-width:580px; margin:0 auto;">
+    <div class="page-header">
+        <h1>Claim Your Item</h1>
+        <p>Provide proof of ownership so the administrator can verify and approve your claim.</p>
+    </div>
+    <div class="card">
+        <div style="background:#fff3cd; border-left:4px solid var(--gold); padding:14px; border-radius:8px; margin-bottom:24px;">
+            <strong>⚠️ Important:</strong> Please provide accurate proof of ownership. 
+            False claims may result in account suspension.
+        </div>
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Proof of Ownership Details</label>
+                <textarea name="proof_details" class="form-control" rows="5" required
+                    placeholder="Describe how you can prove this item belongs to you. For example:
+- Serial number or IMEI
+- Brand and purchase details
+- Unique markings or customizations
+- Contents of the item (for wallets/bags)
+- Any other identifying information"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Supporting Photo (optional)</label>
+                <input type="file" name="proof_image" class="form-control" accept=".jpg,.jpeg,.png">
+                <small style="color:#888; font-size:0.8rem;">Upload a receipt, photo with item, or any supporting document</small>
+            </div>
+            <button type="submit" class="btn btn-gold" style="width:100%;">
+                Submit Claim for Review
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}Report Lost Item — MSU Lost & Found{% endblock %}
+{% block content %}
+<div style="max-width:680px; margin:0 auto;">
+    <div class="page-header">
+        <h1>Report a Lost Item</h1>
+        <p>Fill in the details below. Our AI will instantly search for a match.</p>
+    </div>
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" id="category" class="form-control" required>
+                        <option value="">-- Select Category --</option>
+                        {% for category in item_categories %}
+                        <option value="{{ category }}">{{ category }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Item Type</label>
+                    <select name="item_name" id="item_name" class="form-control" required disabled>
+                        <option value="">-- Select Item Type --</option>
+                    </select>
+                    <input type="text" name="item_name_other" id="item_name_other" class="form-control" placeholder="Type item manually"
+                           style="display:block; margin-top:8px;" maxlength="100" />
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Colour</label>
+                    <input type="text" name="colour" class="form-control" placeholder="e.g. Black, Blue">
+                </div>
+                <div class="form-group">
+                    <label>Date Lost</label>
+                    <input type="date" name="date_lost" class="form-control">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Location Lost</label>
+                <input type="text" name="location_lost" class="form-control" placeholder="e.g. Library Block B, Lecture Hall 3">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea name="description" class="form-control" rows="4"
+                    placeholder="Describe your item in detail — colour, brand, size, any unique features..." required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Upload Image (optional but recommended)</label>
+                <input type="file" name="image" class="form-control" accept=".jpg,.jpeg,.png">
+                <small style="color:#888; font-size:0.8rem;">Supported formats: JPG, JPEG, PNG. Max size: 16MB</small>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;">
+                🔍 Report & Search for Match
+            </button>
+        </form>
+    </div>
+</div>
+<script>
+    const itemCategories = {{ item_categories|tojson }};
+    const categorySelect = document.getElementById('category');
+    const itemTypeSelect = document.getElementById('item_name');
+
+    function updateItemTypes() {
+        const selectedCategory = categorySelect.value;
+        const itemTypes = itemCategories[selectedCategory] || [];
+
+        // Always append an Other option so the user can type anything.
+        itemTypeSelect.innerHTML = '<option value="">-- Select Item Type --</option>';
+        itemTypes.forEach((itemType) => {
+            const option = document.createElement('option');
+            option.value = itemType;
+            option.textContent = itemType;
+            itemTypeSelect.appendChild(option);
+        });
+
+        const otherOption = document.createElement('option');
+        otherOption.value = '__other__';
+        otherOption.textContent = 'Other (type manually)';
+        itemTypeSelect.appendChild(otherOption);
+
+        itemTypeSelect.disabled = itemTypes.length === 0;
+        toggleOtherInput();
+    }
+
+
+    function toggleOtherInput() {
+        const otherInput = document.getElementById('item_name_other');
+        if (!otherInput) return;
+        otherInput.style.display = 'block';
+        otherInput.required = false;
+    }
+
+
+
+    categorySelect.addEventListener('change', updateItemTypes);
+    itemTypeSelect.addEventListener('change', toggleOtherInput);
+
+
+</script>
+{% endblock %}

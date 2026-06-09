@@ -1,0 +1,91 @@
+lost_item,lost_category,lost_desc,matched_item,matched_category,matched_desc,nlp_score,cv_score,hybrid_score,is_match
+Backpack,backpack,A small brown backpack with multiple pockets and a Puma logo on the front.,Backpack,backpack,A large brown school backpack with side mesh pockets for water bottles.,0.5443,1.0,0.8177,True
+Backpack,backpack,A large pink school backpack with side mesh pockets for water bottles.,Backpack,backpack,A large black school backpack with side mesh pockets for water bottles.,0.9695,0.5523,0.7192,True
+Backpack,backpack,A Nike backpack in grey with a padded laptop sleeve inside.,Backpack,backpack,A worn grey backpack with a top zipper pocket and thin shoulder straps.,0.5911,1.0,0.8364,True
+Backpack,backpack,A large white backpack with multiple pockets and a Apple logo on the front.,Backpack,backpack,A worn white backpack with a top zipper pocket and adjustable shoulder straps.,0.5097,1.0,0.8039,True
+Backpack,backpack,A medium orange backpack with multiple pockets and a Apple logo on the front.,Backpack,backpack,A Lenovo backpack in orange with a padded laptop sleeve inside.,0.5511,1.0,0.8204,True
+Backpack,backpack,A worn black backpack with a side zipper pocket and adjustable shoulder straps.,Backpack,backpack,A large black school backpack with side mesh pockets for water bottles.,0.457,1.0,0.7828,True
+Backpack,backpack,A medium navy backpack with multiple pockets and a Nike logo on the front.,Backpack,backpack,"A navy backpack with adjustable straps and a large main compartment, suitable for carrying books.",0.4718,1.0,0.7887,True
+Backpack,backpack,A medium white backpack with multiple pockets and a Lenovo logo on the front.,Backpack,backpack,A worn white backpack with a side zipper pocket and wide shoulder straps.,0.5315,1.0,0.8126,True
+Backpack,backpack,A Nike backpack in orange with a padded laptop sleeve inside.,Backpack,backpack,A Huawei backpack in orange with a padded laptop sleeve inside.,0.8911,1.0,0.9564,True
+Backpack,backpack,"A black backpack with thin straps and a small main compartment, suitable for carrying books.",Backpack,backpack,"A navy backpack with adjustable straps and a large main compartment, suitable for carrying books.",0.8284,0.6298,0.7092,True
+Comb,comb,A brown wide-tooth comb with a protective carry case.,Suitcase,suitcase,A white fabric suitcase with a Huawei logo tag and two front zip pockets.,0.3685,0.4433,0.4134,False
+Comb,comb,"A small black comb used for hair grooming, slightly bent on one side.",Cup,cup,A grey mug with a hairline crack on the handle and Samsung branding.,0.3584,0.4472,0.4117,False
+Comb,comb,A white wide-tooth comb with a protective carry case.,Sneakers,sneakers,A size 6 pair of white Samsung sneakers with a velcro strap and reflective strip.,0.263,0.5296,0.423,False
+Comb,comb,A black plastic comb with fine teeth and a long handle.,Cup,cup,A grey mug with a hairline crack on the handle and Puma branding.,0.5124,0.277,0.3711,False
+Comb,comb,"A large pink comb used for hair grooming, slightly bent on one side.",Sneakers,sneakers,A worn pair of black sneakers with a Lenovo logo stitched on the side.,0.2263,0.4947,0.3873,False
+Cup,cup,A grey mug with a hairline crack on the handle and Huawei branding.,Cup,cup,A grey mug with a hairline crack on the handle and Puma branding.,0.7088,1.0,0.8835,True
+Cup,cup,A white ceramic cup with a Nike logo printed on the side.,Cup,cup,A white stainless steel travel cup with a screw-on lid and handle.,0.3682,1.0,0.7473,True
+Cup,cup,A white stainless steel travel cup with a screw-on lid and handle.,Cup,cup,A white stainless steel travel cup with a screw-on lid and handle.,1.0,0.8041,0.8825,True
+Cup,cup,A black ceramic cup with a Lenovo logo printed on the side.,Cup,cup,A black stainless steel travel cup with a screw-on lid and handle.,0.467,1.0,0.7868,True
+Cup,cup,A black stainless steel travel cup with a screw-on lid and handle.,Cup,cup,A large black reusable cup found near the university cafeteria.,0.4812,1.0,0.7925,True
+Cup,cup,A medium grey reusable cup found near the university cafeteria.,Cup,cup,A large black reusable cup found near the university cafeteria.,0.9139,0.6793,0.7732,True
+Cup,cup,A grey stainless steel travel cup with a screw-on lid and handle.,Cup,cup,A large grey reusable cup found near the university cafeteria.,0.462,1.0,0.7848,True
+Cup,cup,A green mug with a hairline crack on the handle and Reebok branding.,Cup,cup,A small green reusable cup found near the university cafeteria.,0.3062,1.0,0.7225,True
+Cup,cup,A large grey plastic cup with a fitted lid and straw slot.,Cup,cup,A large white plastic cup with a fitted lid and straw slot.,0.9607,0.6467,0.7723,True
+Cup,cup,A large white reusable cup found near the university cafeteria.,Cup,cup,A white ceramic cup with a Puma logo printed on the side.,0.4719,1.0,0.7888,True
+Cup,cup,A white ceramic cup with a Adidas logo printed on the side.,Cup,cup,A large white reusable cup found near the university cafeteria.,0.4605,1.0,0.7842,True
+Cup,cup,A white stainless steel travel cup with a screw-on lid and handle.,Cup,cup,A large white plastic cup with a fitted lid and straw slot.,0.5843,1.0,0.8337,True
+Earphones,earphones,A set of brown earphones with foam ear tips and slightly tangled wire.,Earphones,earphones,A set of brown earphones with foam ear tips and slightly tangled wire.,1.0,1.0,1.0,True
+Earphones,earphones,A pair of grey in-ear earphones with a 3.5mm jack connector.,Earphones,earphones,A pair of grey wired earphones with a Apple logo on the earbuds.,0.711,1.0,0.8844,True
+Earphones,earphones,A Generic pair of black earphones with an inline microphone and volume control.,Earphones,earphones,A pair of black in-ear earphones with a 3.5mm jack connector.,0.5751,1.0,0.83,True
+Earphones,earphones,A pair of pink in-ear earphones with a 3.5mm jack connector.,Earphones,earphones,A Adidas pair of pink earphones with an inline microphone and volume control.,0.5699,1.0,0.828,True
+Earphones,earphones,A pair of white wired earphones with a Lenovo logo on the earbuds.,Earphones,earphones,A set of white earphones with foam ear tips and slightly tangled wire.,0.6085,1.0,0.8434,True
+Earphones,earphones,A pair of white wired earphones with a Generic logo on the earbuds.,Earphones,earphones,A pair of white wired earphones with a Reebok logo on the earbuds.,0.9072,1.0,0.9629,True
+Earphones,earphones,A pair of white wired earphones with a Nike logo on the earbuds.,Earphones,earphones,A pair of white Bluetooth earphones with a magnetic charging case.,0.5434,1.0,0.8174,True
+Laptop,laptop,A thin white laptop with a HP logo and USB-C charging port.,Laptop,laptop,A white Reebok laptop with a small inch widescreen display.,0.4933,1.0,0.7973,True
+Laptop,laptop,A thin white laptop with a HP logo and USB-C charging port.,Laptop,laptop,A white Nike laptop with a large inch widescreen display.,0.4846,1.0,0.7938,True
+Phone,phone,A white Apple smartphone with a cracked front screen.,Phone,phone,A Puma white phone with a damaged charging port and scratched back.,0.4779,1.0,0.7912,True
+Phone,phone,A Puma phone enclosed in a brown silicone protective case.,Phone,phone,A brown Puma smartphone with a cracked front screen.,0.5868,1.0,0.8347,True
+Phone,phone,A medium inch black phone with a fingerprint scanner on the rear.,Phone,phone,A black Samsung smartphone with a cracked front screen.,0.3343,1.0,0.7337,True
+Rugby Ball,rugby_ball,A white rugby ball with a slightly deflated feel and mud stains.,Rugby Ball,rugby_ball,A large white match rugby ball with a Lenovo brand label.,0.413,1.0,0.7652,True
+Rugby Ball,rugby_ball,A large brown match rugby ball with a Adidas brand label.,Rugby Ball,rugby_ball,A small brown match rugby ball with a Generic brand label.,0.862,1.0,0.9448,True
+Rugby Ball,rugby_ball,A grey rugby ball with a slightly deflated feel and mud stains.,Rugby Ball,rugby_ball,A grey rugby ball with a slightly deflated feel and mud stains.,1.0,1.0,1.0,True
+Rugby Boots,rugby_boots,A white pair of rugby boots with one missing stud and mud on the soles.,Rugby Boots,rugby_boots,A white pair of rugby boots with one missing stud and mud on the soles.,1.0,1.0,1.0,True
+Rugby Boots,rugby_boots,A pair of white Nike rugby boots with reinforced toe cap.,Rugby Boots,rugby_boots,A pair of white Lenovo rugby boots with reinforced toe cap.,0.9145,1.0,0.9658,True
+Rugby Boots,rugby_boots,A white pair of rugby boots with one missing stud and mud on the soles.,Rugby Boots,rugby_boots,A pair of Huawei white rugby boots size 7 with ankle padding.,0.6085,1.0,0.8434,True
+Rugby Boots,rugby_boots,A pair of HP white rugby boots size 12 with ankle padding.,Rugby Boots,rugby_boots,A size 7 pair of white rugby boots with high ankle support.,0.8468,1.0,0.9387,True
+Rugby Boots,rugby_boots,A pair of Puma white rugby boots size 8 with ankle padding.,Rugby Boots,rugby_boots,A pair of white rugby boots with metal screw-in studs.,0.6565,1.0,0.8626,True
+Sneakers,sneakers,A size 11 pair of pink Nike sneakers with a velcro strap and reflective strip.,Sneakers,sneakers,A size 8 pair of pink Huawei sneakers with a velcro strap and reflective strip.,0.9288,1.0,0.9715,True
+Sneakers,sneakers,A pair of white canvas sneakers with lace-up front and flat sole.,Sneakers,sneakers,A pair of white Puma sneakers size 10 with white rubber soles.,0.6861,1.0,0.8745,True
+Sneakers,sneakers,A worn pair of white sneakers with a Puma logo stitched on the side.,Sneakers,sneakers,A size 7 pair of white Lenovo sneakers with a velcro strap and reflective strip.,0.4428,1.0,0.7771,True
+Sneakers,sneakers,A worn pair of white sneakers with a Nike logo stitched on the side.,Sneakers,sneakers,A worn pair of white sneakers with a Lenovo logo stitched on the side.,0.8757,1.0,0.9503,True
+Sneakers,sneakers,A pair of pink Huawei sneakers size 9 with white rubber soles.,Sneakers,sneakers,A Reebok pair of pink running sneakers with mesh upper and cushioned insole.,0.614,1.0,0.8456,True
+Sneakers,sneakers,A Huawei pair of white running sneakers with mesh upper and cushioned insole.,Sneakers,sneakers,A pair of white HP sneakers size 10 with white rubber soles.,0.6078,1.0,0.8431,True
+Sneakers,sneakers,A pair of white Huawei sneakers size 9 with white rubber soles.,Sneakers,sneakers,A pair of white canvas sneakers with lace-up front and flat sole.,0.6903,1.0,0.8761,True
+Sneakers,sneakers,A Puma pair of black running sneakers with mesh upper and cushioned insole.,Sneakers,sneakers,A worn pair of black sneakers with a Lenovo logo stitched on the side.,0.5407,1.0,0.8163,True
+Sneakers,sneakers,A worn pair of white sneakers with a Reebok logo stitched on the side.,Sneakers,sneakers,A pair of white Generic sneakers size 9 with white rubber soles.,0.5634,1.0,0.8253,True
+Sneakers,sneakers,A pair of white HP sneakers size 9 with white rubber soles.,Sneakers,sneakers,A size 6 pair of white Samsung sneakers with a velcro strap and reflective strip.,0.6451,1.0,0.858,True
+Sneakers,sneakers,A Apple pair of white running sneakers with mesh upper and cushioned insole.,Sneakers,sneakers,A pair of white canvas sneakers with lace-up front and flat sole.,0.635,1.0,0.854,True
+Soccer Ball,soccer_ball,A Puma brown soccer ball slightly deflated with scuff marks.,Soccer Ball,soccer_ball,A brown match soccer ball with grass stains and worn surface.,0.5254,1.0,0.8102,True
+Soccer Ball,soccer_ball,A white match soccer ball with grass stains and worn surface.,Soccer Ball,soccer_ball,A Nike white soccer ball slightly deflated with scuff marks.,0.5779,1.0,0.8312,True
+Suitcase,suitcase,A small grey suitcase with a broken retractable handle.,Suitcase,suitcase,A grey hard-shell suitcase with four spinner wheels and a combination lock.,0.4046,1.0,0.7618,True
+Suitcase,suitcase,A small grey rolling suitcase with a TSA-approved combination lock.,Suitcase,suitcase,A small grey rolling suitcase with a TSA-approved combination lock.,1.0,1.0,1.0,True
+Suitcase,suitcase,A white travel suitcase with a luggage tag and name label attached.,Suitcase,suitcase,A white travel suitcase with a luggage tag and name label attached.,1.0,1.0,1.0,True
+Suitcase,suitcase,A white fabric suitcase with a Lenovo logo tag and two front zip pockets.,Suitcase,suitcase,A medium white rolling suitcase with a TSA-approved combination lock.,0.4466,1.0,0.7786,True
+Suitcase,suitcase,A large white rolling suitcase with a TSA-approved combination lock.,Suitcase,suitcase,A small grey rolling suitcase with a TSA-approved combination lock.,0.9605,0.6486,0.7733,True
+Wallet,wallet,A slim grey wallet with a HP logo and visible wear on the edges.,Wallet,wallet,A large grey zip-around wallet with wrist strap attachment.,0.3294,1.0,0.7318,True
+Wallet,wallet,A Apple black wallet with a coin zip pocket and embossed logo.,Wallet,wallet,A black wallet found containing a student ID card and some coins.,0.4627,1.0,0.7851,True
+Wallet,wallet,A Lenovo white wallet with a coin zip pocket and embossed logo.,Wallet,wallet,A white leather bifold wallet with multiple card slots and a note compartment.,0.3677,1.0,0.7471,True
+Wallet,wallet,A small white zip-around wallet with wrist strap attachment.,Wallet,wallet,A white wallet found containing a student ID card and some coins.,0.3072,1.0,0.7229,True
+Wallet,wallet,A grey leather bifold wallet with multiple card slots and a note compartment.,Wallet,wallet,A white leather bifold wallet with multiple card slots and a note compartment.,0.9664,0.3511,0.5972,False
+Water Bottle,water_bottle,A pink gym water bottle with a Nike logo and minor dents on the side.,Water Bottle,water_bottle,A pink transparent water bottle with a screw-on cap and measurement markings.,0.4391,1.0,0.7756,True
+Water Bottle,water_bottle,A Apple grey stainless steel insulated water bottle 500ml capacity.,Water Bottle,water_bottle,A grey plastic water bottle with a flip-top sports lid.,0.4911,1.0,0.7964,True
+Water Bottle,water_bottle,A white plastic water bottle with a flip-top sports lid.,Water Bottle,water_bottle,A white transparent water bottle with a screw-on cap and measurement markings.,0.5651,1.0,0.826,True
+Water Bottle,water_bottle,A black plastic water bottle with a flip-top sports lid.,Water Bottle,water_bottle,A black plastic water bottle with a flip-top sports lid.,1.0,1.0,1.0,True
+Water Bottle,water_bottle,A grey transparent water bottle with a screw-on cap and measurement markings.,Water Bottle,water_bottle,A grey plastic water bottle with a flip-top sports lid.,0.5458,1.0,0.8183,True
+Water Bottle,water_bottle,A white gym water bottle with a Samsung logo and minor dents on the side.,Water Bottle,water_bottle,A white gym water bottle with a Reebok logo and minor dents on the side.,0.8514,1.0,0.9406,True
+Water Bottle,water_bottle,A white plastic water bottle with a flip-top sports lid.,Water Bottle,water_bottle,A white gym water bottle with a Huawei logo and minor dents on the side.,0.4528,1.0,0.7811,True
+Water Bottle,water_bottle,A Lenovo white stainless steel insulated water bottle 500ml capacity.,Water Bottle,water_bottle,A white plastic water bottle with a flip-top sports lid.,0.482,1.0,0.7928,True
+Water Bottle,water_bottle,A white transparent water bottle with a screw-on cap and measurement markings.,Water Bottle,water_bottle,A Generic white stainless steel insulated water bottle 500ml capacity.,0.5145,1.0,0.8058,True
+Water Bottle,water_bottle,A white transparent water bottle with a screw-on cap and measurement markings.,Water Bottle,water_bottle,A small white water bottle with a carry handle and built-in straw.,0.4878,1.0,0.7951,True
+Wrist Watch,wrist_watch,A Generic grey digital watch with a rubber sports strap.,Wrist Watch,wrist_watch,A grey wrist watch with a leather strap and classic round face.,0.7368,1.0,0.8947,True
+Wrist Watch,wrist_watch,A white analog watch with a stainless steel bracelet and Apple logo on the face.,Wrist Watch,wrist_watch,A white analog watch with a stainless steel bracelet and Adidas logo on the face.,0.8969,1.0,0.9588,True
+Wrist Watch,wrist_watch,A HP white digital watch with a rubber sports strap.,Wrist Watch,wrist_watch,A Lenovo white digital watch with a rubber sports strap.,0.912,1.0,0.9648,True
+Wrist Watch,wrist_watch,A Apple black sports watch with a chronograph and date display.,Wrist Watch,wrist_watch,A black watch with a large face and a cracked crystal glass.,0.3889,1.0,0.7556,True
+Wrist Watch,wrist_watch,A white watch with a large face and a cracked crystal glass.,Wrist Watch,wrist_watch,A Puma white digital watch with a rubber sports strap.,0.3486,1.0,0.7394,True
+Wrist Watch,wrist_watch,A brown watch with a large face and a cracked crystal glass.,Wrist Watch,wrist_watch,A Adidas brown digital watch with a rubber sports strap.,0.3717,1.0,0.7487,True
+Wrist Watch,wrist_watch,A grey analog watch with a stainless steel bracelet and Adidas logo on the face.,Wrist Watch,wrist_watch,A Adidas grey digital watch with a rubber sports strap.,0.6366,1.0,0.8546,True
+Wrist Watch,wrist_watch,A grey wrist watch with a leather strap and classic round face.,Wrist Watch,wrist_watch,A grey analog watch with a stainless steel bracelet and Reebok logo on the face.,0.7182,1.0,0.8873,True
+Wrist Watch,wrist_watch,A grey analog watch with a stainless steel bracelet and Huawei logo on the face.,Wrist Watch,wrist_watch,A grey analog watch with a stainless steel bracelet and Samsung logo on the face.,0.8651,1.0,0.946,True
+Wrist Watch,wrist_watch,A black wrist watch with a leather strap and classic round face.,Wrist Watch,wrist_watch,A Samsung black sports watch with a chronograph and date display.,0.477,1.0,0.7908,True

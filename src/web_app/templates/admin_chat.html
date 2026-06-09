@@ -1,0 +1,335 @@
+{% extends "base.html" %}
+{% block title %}MSU Lost & Found — Admin Chat{% endblock %}
+
+{% block extra_css %}
+<style>
+  .admin-chat-layout{display:grid;grid-template-columns:320px 1fr;gap:24px;align-items:start;}
+  .room-list{background:var(--white);border-radius:16px;box-shadow:var(--shadow);padding:18px;}
+  .room-list h3{font-family:'Playfair Display',serif;color:var(--navy);margin-bottom:10px;}
+  .room-item{width:100%;text-align:left;background:#f6f9ff;border:1px solid #e2e9ff;border-radius:12px;padding:12px 12px;margin-bottom:10px;cursor:pointer;}
+  .room-item.active{background:#eaf2ff;border-color:rgba(0,51,102,0.3);}
+  .room-item .meta{font-size:.8rem;color:#666;margin-top:4px;}
+  .chat-empty{color:#666;font-size:.9rem;line-height:1.5;padding:10px 0;}
+
+  .chat-window{background:var(--white);border-radius:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;height:70vh;min-height:420px;}
+  .chat-toolbar{display:flex;justify-content:space-between;align-items:center;padding:18px 18px 0;gap:12px;}
+  .chat-toolbar .toolbar-actions{display:flex;gap:10px;flex-wrap:wrap;}
+  .btn-outline{background:transparent;color:var(--navy);border:1px solid rgba(0,51,102,0.2);}
+  .btn-outline:hover{background:rgba(0,51,102,0.05);}
+  .encryption-notice{align-self:center;max-width:82%;margin:14px 18px 0;padding:9px 12px;border-radius:10px;background:#fff7dc;color:#6b5a1e;border:1px solid #f1df9a;font-size:.78rem;line-height:1.4;text-align:center;}
+  .encryption-notice strong{font-weight:800;}
+  .chat-messages{padding:18px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:12px;}
+  .bubble{max-width:82%;padding:12px 14px;border-radius:14px;box-shadow:0 1px 0 rgba(0,0,0,0.04);font-size:.95rem;line-height:1.45;}
+  .bubble.admin{align-self:flex-start;background:#f4f7ff;color:#0b2a5a;border:1px solid rgba(0,51,102,0.12)}
+  .bubble.user{align-self:flex-end;background:#eaf2ff;color:#0b2a5a;border:1px solid rgba(0,51,102,0.15)}
+  .bubble .meta{font-size:.75rem;opacity:.7;margin-bottom:6px;font-weight:600;}
+
+  .chat-input-bar{border-top:1px solid #eef0f5;padding:14px;display:flex;gap:10px;align-items:center;}
+  .chat-input-bar input{flex:1;padding:12px 14px;border-radius:10px;border:2px solid #e0e7ef;font-family:'DM Sans',sans-serif;font-size:.95rem;background:#fafbfd;}
+  .chat-input-bar input:focus{outline:none;border-color:var(--navy);background:white}
+
+  @media (max-width: 900px){.admin-chat-layout{grid-template-columns:1fr}.chat-window{height:64vh}}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-chat-layout">
+  <aside class="room-list">
+    <h3>Chat Rooms</h3>
+    <div style="color:#666;font-size:.9rem;margin-bottom:12px;line-height:1.5;">
+      Select a user room. Messages are stored in the database and fetched by polling.
+    </div>
+    <div id="rooms"></div>
+  </aside>
+
+  <section class="chat-window">
+    <div class="chat-toolbar">
+      <div id="activeRoomTitle" style="font-size:.95rem;font-weight:700;color:var(--navy);">Select a room</div>
+      <div class="toolbar-actions">
+        <button class="btn btn-outline" type="button" onclick="clearActiveChat()">Clear Chat</button>
+        <button class="btn btn-outline" type="button" onclick="deleteActiveRoom()">Delete User</button>
+      </div>
+    </div>
+    <div class="encryption-notice">
+      &#128274; Messages and images are secured between MSU Lost &amp; Found support and this user. No one outside this chat can read them.
+    </div>
+    <div class="chat-messages" id="messages"></div>
+    <div class="chat-input-bar">
+      <input id="chatImage" type="file" accept=".jpg,.jpeg,.png" aria-label="Upload image" style="max-width:190px;" />
+      <input id="chatInput" type="text" placeholder="Type a reply..." autocomplete="off" />
+      <button class="btn btn-gold" type="button" onclick="sendMessage()">Send</button>
+    </div>
+  </section>
+</div>
+
+<script>
+  const roomsEl = document.getElementById('rooms');
+  const messagesEl = document.getElementById('messages');
+  const inputEl = document.getElementById('chatInput');
+  const imageEl = document.getElementById('chatImage');
+  const activeRoomTitleEl = document.getElementById('activeRoomTitle');
+
+  let activeRoomId = null;
+  let activeRoomUserId = null;
+  let lastMessageId = 0;
+  let pollingTimer = null;
+
+  function showToast(msg){
+    let el = document.getElementById('chatStatus');
+    if(!el){
+      el = document.createElement('div');
+      el.id = 'chatStatus';
+      el.style.cssText = 'position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 14px;border-radius:10px;z-index:9999;font-size:0.9rem;max-width:90vw;';
+      document.body.appendChild(el);
+    }
+    el.textContent = msg;
+    setTimeout(()=>{ if(el) el.remove(); }, 3500);
+  }
+
+  async function safeJson(res){
+    const text = await res.text();
+    try{ return JSON.parse(text); }catch(e){ return {__raw:text}; }
+  }
+
+  async function chatFetch(url, options = {}){
+    try{
+      const res = await fetch(url, {
+        credentials: 'same-origin',
+        ...options
+      });
+      if(!res.ok){
+        const body = await res.text().catch(()=>'' );
+        showToast(`Chat error ${res.status}: ${body.slice(0,200)}`);
+      }
+      return res;
+    }catch(e){
+      showToast(`Chat request failed: ${e}`);
+      throw e;
+    }
+  }
+
+  function updateLastMessageId(id){
+    const numericId = Number(id || 0);
+    if(Number.isFinite(numericId)){
+      lastMessageId = Math.max(lastMessageId, numericId);
+    }
+  }
+
+  function extractImageToken(rawText){
+    const text = String(rawText || '');
+    const token = "\n[image]";
+    const idx = text.indexOf(token);
+    if(idx === -1){
+      return { text, imagePath: null };
+    }
+    const before = text.slice(0, idx).trimEnd();
+    const imagePath = text.slice(idx + token.length).trim();
+    return { text: before, imagePath: imagePath || null };
+  }
+
+  function addBubble(rawMessage, who){
+    const wrap = document.createElement('div');
+    wrap.className = 'bubble ' + (who === 'admin' ? 'admin' : 'user');
+
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = who === 'admin' ? 'Admin' : 'User';
+
+    const { text, imagePath } = extractImageToken(rawMessage);
+
+    const body = document.createElement('div');
+
+    if(text){
+      const p = document.createElement('div');
+      p.textContent = text;
+      body.appendChild(p);
+    }
+
+    if(imagePath){
+      const imgWrap = document.createElement('div');
+      imgWrap.style.marginTop = '10px';
+
+      const img = document.createElement('img');
+      img.src = '/uploaded/' + encodeURI(imagePath.replace(/^\/+/, ''));
+      img.alt = 'Chat image';
+      img.style.maxWidth = '240px';
+      img.style.maxHeight = '160px';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '10px';
+
+      imgWrap.appendChild(img);
+      body.appendChild(imgWrap);
+    }
+
+    wrap.appendChild(meta);
+    wrap.appendChild(body);
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  async function loadRooms(){
+    const res = await chatFetch('/admin/chat/rooms');
+    if(!res.ok) return;
+    const data = await res.json();
+
+    // Cache for room->user mapping used by message bubble classification.
+    // Expect each room object to include: { room_id, user_id, full_name, email }
+    window.__roomsCache = data.rooms || [];
+
+
+    roomsEl.innerHTML = '';
+
+    if(!data.rooms || data.rooms.length === 0){
+      roomsEl.innerHTML = '<div class="chat-empty">No chat rooms yet. A room appears here after a user opens support chat or sends a message.</div>';
+      clearChat();
+      return;
+    }
+
+    (data.rooms || []).forEach(r => {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'room-item' + (String(activeRoomId) === String(r.room_id) ? ' active' : '');
+      item.innerHTML = `<div style="font-weight:700;color:var(--navy)">${r.full_name}</div><div class="meta">${r.email}</div>`;
+      item.onclick = () => selectRoom(r.room_id);
+      roomsEl.appendChild(item);
+    });
+
+    // auto-select first room
+    if(!activeRoomId && data.rooms && data.rooms.length>0){
+      selectRoom(data.rooms[0].room_id);
+    }
+  }
+
+  function updateActiveRoomTitle(){
+    const room = (window.__roomsCache || []).find(r => String(r.room_id) === String(activeRoomId));
+    if(room){
+      activeRoomTitleEl.textContent = `${room.full_name} — ${room.email}`;
+    } else {
+      activeRoomTitleEl.textContent = 'Select a room';
+    }
+  }
+
+  async function deleteActiveRoom(){
+    if(!activeRoomId){
+      showToast('No room selected.');
+      return;
+    }
+    if(!confirm('Delete this user account and all their chat history? This cannot be undone.')){
+      return;
+    }
+
+    const res = await chatFetch('/admin/chat/delete', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({room_id: activeRoomId})
+    });
+    if(!res.ok){
+      const t = await res.text().catch(()=> '');
+      showToast(`Delete failed (${res.status}): ${t.slice(0,120)}`);
+      return;
+    }
+
+    showToast('User account and chat history deleted.');
+    activeRoomId = null;
+    activeRoomUserId = null;
+    clearChat();
+    if(pollingTimer) clearInterval(pollingTimer);
+    loadRooms();
+  }
+
+  function clearChat(){
+    messagesEl.innerHTML = '';
+    lastMessageId = 0;
+  }
+
+  async function loadMessages(){
+    if(!activeRoomId) return;
+    const res = await chatFetch(`/admin/chat/messages?room_id=${activeRoomId}&after_id=${lastMessageId}`);
+    if(!res.ok) return;
+    const data = await res.json();
+
+    (data.messages || []).forEach(m => {
+      updateLastMessageId(m.id);
+      // Decide bubble type purely from sender_user_id:
+      // - if message sender is the selected room's user => user bubble
+      // - otherwise => admin bubble
+      // If activeRoomUserId is null (e.g., missing user_id in rooms), fall back to showing all as admin.
+      const who = (activeRoomUserId !== null && String(m.sender_user_id) === String(activeRoomUserId)) ? 'user' : 'admin';
+      addBubble(m.message, who);
+    });
+  }
+
+  async function clearActiveChat(){
+    if(!activeRoomId) return;
+    const res = await chatFetch('/admin/chat/clear', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({room_id: activeRoomId})
+    });
+    if(!res.ok){
+      const t = await res.text().catch(()=> '');
+      showToast(`Clear chat failed (${res.status}): ${t.slice(0,120)}`);
+      return;
+    }
+    showToast('Chat messages cleared.');
+    clearChat();
+    loadMessages();
+  }
+
+  function selectRoom(roomId){
+    activeRoomId = roomId;
+
+    // Determine the user_id that this room belongs to (returned by /admin/chat/rooms).
+    const room = (window.__roomsCache || []).find(r => String(r.room_id) === String(roomId));
+    activeRoomUserId = room ? room.user_id : null;
+
+    updateActiveRoomTitle();
+    clearChat();
+    loadMessages();
+
+    if(pollingTimer) clearInterval(pollingTimer);
+    pollingTimer = setInterval(loadMessages, 2000);
+
+    // refresh rooms UI selection
+    loadRooms();
+  }
+
+  async function sendMessage(){
+    const msg = (inputEl.value || '').trim();
+    const file = imageEl && imageEl.files && imageEl.files[0] ? imageEl.files[0] : null;
+
+    if(!activeRoomId) return;
+    if(!msg && !file) return;
+
+    inputEl.value = '';
+    if(imageEl) imageEl.value = '';
+
+    // optimistic UI for text; avoid fake pending image render
+    if(file){
+      addBubble(msg || 'Sending image...', 'admin');
+    }else{
+      addBubble(msg, 'admin');
+    }
+
+    const form = new FormData();
+    form.append('room_id', activeRoomId);
+    form.append('message', msg || '');
+    if(file) form.append('image', file);
+
+    const res = await chatFetch('/chat/admin/send', { method:'POST', body: form });
+    if(!res.ok) return;
+
+    const data = await safeJson(res);
+    if(data && data.message_id) updateLastMessageId(data.message_id);
+
+    await loadMessages();
+  }
+
+  inputEl.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') sendMessage();
+  });
+
+  // initial
+  loadRooms();
+</script>
+{% endblock %}

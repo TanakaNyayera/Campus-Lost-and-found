@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MSU Lost & Found{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy:   #003366;
+            --gold:   #C9973A;
+            --gold-dark: #826225;
+            --light:  #F4F6F9;
+            --white:  #FFFFFF;
+            --dark:   #1A1A2E;
+            --success:#2ECC71;
+            --danger: #E74C3C;
+            --info:   #3498DB;
+            --shadow: 0 4px 20px rgba(0,51,102,0.12);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        /* ── Navbar ── */
+        nav {
+            background: var(--navy);
+            padding: 0 28px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 65px;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            gap: 14px;
+        }
+
+        .nav-auth{
+            margin-left: auto;
+            display:flex;
+            align-items:center;
+            gap:8px;
+        }
+        .nav-auth a{
+            color: rgba(255,255,255,0.96);
+            text-decoration:none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-auth a:hover{ background: rgba(255,255,255,0.15); color: white; }
+
+        /* hamburger (top-left) */
+        .hamburger {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.25);
+            background: rgba(255,255,255,0.08);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+        }
+        .hamburger:focus { outline: none; box-shadow: 0 0 0 3px rgba(201,151,58,0.35); }
+        .hamburger .lines {
+            width: 20px;
+            height: 14px;
+            position: relative;
+        }
+        .hamburger .lines span {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 2px;
+        }
+        .hamburger .lines span:nth-child(1){ top: 0; }
+        .hamburger .lines span:nth-child(2){ top: 6px; }
+        .hamburger .lines span:nth-child(3){ bottom: 0; }
+
+        /* logo */
+        .nav-brand {
+            display: inline-flex;
+            align-items: center;
+            text-decoration: none;
+            padding: 0 12px;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+        .nav-brand:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .nav-brand img{
+            height: 56px;
+            width: auto;
+            display: block;
+            margin: 0;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+        }
+
+        /* mobile menu (dropdown) */
+        .nav-links {
+            margin-left: auto; /* keep room on the right; dropdown overlays below on small screens */
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .menu-dropdown {
+            display: none;
+            position: absolute;
+            top: 65px;
+            left: 18px;
+            right: 18px;
+            background: var(--navy);
+            border: 2px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            padding: 10px;
+            box-shadow: var(--shadow);
+        }
+        .menu-dropdown a {
+            display: flex;
+            width: 100%;
+            color: rgba(255,255,255,0.96);
+            text-decoration: none;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            margin-bottom: 6px;
+        }
+        .menu-dropdown a:hover { background: rgba(255,255,255,0.15); color: white; }
+        .menu-dropdown a:last-child { margin-bottom: 0; }
+
+        .menu-dropdown a.btn-gold {
+            background: var(--gold-dark);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .menu-dropdown a.btn-gold:hover { background: #6b4a1f; }
+
+        .nav-open .menu-dropdown { display: block; }
+
+        /* hide inline links; hamburger controls everything */
+        @media (min-width: 1px) {
+            .nav-links { display: none; }
+        }
+
+        /* ── Flash messages ── */
+        .flash-container { padding: 10px 40px 0; }
+        .flash {
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .flash.success { background: #d4edda; color: #155724; border-left: 4px solid var(--success); }
+        .flash.danger  { background: #f8d7da; color: #721c24; border-left: 4px solid var(--danger); }
+        .flash.info    { background: #d1ecf1; color: #0c5460; border-left: 4px solid var(--info); }
+
+        /* ── Main content ── */
+        main { padding: 40px; max-width: 1200px; margin: 0 auto; }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+        }
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            color: var(--navy);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        /* ── Forms ── */
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e7ef;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            background: #fafbfd;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--navy);
+            background: white;
+        }
+        textarea.form-control { resize: vertical; min-height: 100px; }
+
+        /* ── Buttons ── */
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s;
+        }
+        .btn-primary { background: var(--navy); color: white; }
+        .btn-primary:hover { background: #002244; transform: translateY(-1px); }
+        .btn-gold { background: var(--gold-dark); color: white; }
+        .btn-gold:hover { background: #6b4a1f; transform: translateY(-1px); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger  { background: var(--danger);  color: white; }
+        .btn-sm { padding: 7px 16px; font-size: 0.85rem; }
+
+        /* ── Grid ── */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 24px; }
+
+        /* ── Stat cards ── */
+        .stat-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--navy);
+        }
+        .stat-card .number {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--navy);
+        }
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: #666;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        /* ── Table ── */
+        table { width:100%; border-collapse:collapse; }
+        th {
+            background: var(--navy);
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        td { padding: 12px 16px; border-bottom: 1px solid #eef0f5; font-size: 0.9rem; }
+        tr:hover td { background: #f8faff; }
+
+        /* ── Badge ── */
+        .badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-danger  { background: #f8d7da; color: #721c24; }
+        .badge-info    { background: #d1ecf1; color: #0c5460; }
+
+        /* ── Page header ── */
+        .page-header {
+            margin-bottom: 30px;
+        }
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--navy);
+        }
+        .page-header p { color: #666; margin-top: 6px; }
+
+        /* ── Footer ── */
+        footer {
+            background: var(--navy);
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 20px;
+            font-size: 0.85rem;
+            margin-top: 60px;
+        }
+        footer span { color: var(--gold); }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 20px; }
+            main { padding: 20px; }
+            .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+        }
+        {% if session.theme_color %}
+        :root { --navy: {{ session.theme_color }}; }
+        {% endif %}
+        {% if session.dark_mode %}
+        body { background:#111827; color:#E5E7EB; }
+        .card, .stat-card { background:#1F2937; color:#E5E7EB; }
+        .form-control { background:#111827; color:#F9FAFB; border-color:#374151; }
+        td { border-bottom-color:#374151; }
+        tr:hover td { background:#172033; }
+        .page-header p, .setting-copy small { color:#CBD5E1; }
+        footer { background:#0B1220; }
+        {% endif %}
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<nav id="topNav">
+    {% if session.user_id %}
+        <button class="hamburger" type="button" aria-label="Open menu" aria-controls="menuDropdown" aria-expanded="false">
+            <div class="lines" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </div>
+        </button>
+    {% endif %}
+
+    <a href="/" class="nav-brand" aria-label="MSU Lost & Found Home">
+        <img src="/static/Logo.jpeg" alt="MSU Logo">
+    </a>
+
+    {% if not session.user_id %}
+        <div class="nav-auth">
+            <a href="/login" role="menuitem">Login</a>
+            <a href="/register" class="btn-gold" role="menuitem">Register</a>
+        </div>
+    {% endif %}
+
+    <div class="menu-dropdown" id="menuDropdown" role="menu" aria-label="Navigation">
+        {% if session.user_id %}
+            <a href="/dashboard" role="menuitem">Dashboard</a>
+            <a href="/report_lost" role="menuitem">Report Lost</a>
+        {% if session.role == 'admin' %}
+            <a href="/report_found" role="menuitem">Report Found</a>
+        {% endif %}
+            <a href="/matches" role="menuitem">Matches</a>
+            {% if session.role == 'admin' %}
+                <a href="/admin" role="menuitem">Admin</a>
+            {% endif %}
+            <a href="/settings" role="menuitem">Settings</a>
+            <a href="/logout" role="menuitem">Logout</a>
+        {% endif %}
+    </div>
+</nav>
+
+<script>
+  (function(){
+    const nav = document.getElementById('topNav');
+    const btn = nav ? nav.querySelector('.hamburger') : null;
+    const dropdown = nav ? nav.querySelector('#menuDropdown') : null;
+
+    if(!btn || !dropdown) return;
+
+    function setExpanded(open){
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      nav.classList.toggle('nav-open', open);
+    }
+
+    btn.addEventListener('click', function(){
+      const isOpen = nav.classList.contains('nav-open');
+      setExpanded(!isOpen);
+    });
+
+    document.addEventListener('click', function(e){
+      if(!nav.contains(e.target)) setExpanded(false);
+    });
+
+    window.addEventListener('keydown', function(e){
+      if(e.key === 'Escape') setExpanded(false);
+    });
+  })();
+</script>
+
+<div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+    {% endwith %}
+</div>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer>
+    <p style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">
+        <img src="/static/Logo.jpeg" alt="MSU Logo" style="height:22px;width:auto;display:inline-block;">
+        <span>© 2025 Lost & Found System</span> — Midlands State University
+    </p>
+</footer>
+
+</body>
+</html>

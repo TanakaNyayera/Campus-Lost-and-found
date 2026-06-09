@@ -1,0 +1,29 @@
+# Copy this file to config/config.yaml and fill in your local values.
+
+database:
+  host: localhost
+  port: 3306
+  name: msu_lost_found
+  user: root
+  password: change-me
+
+flask:
+  secret_key: change-this-secret-key
+  debug: true
+  upload_folder: data/raw/images
+  max_content_length: 16777216
+  base_url: http://localhost:5000
+
+model:
+  hybrid_model_path: models/hybrid/hybrid_model.pkl
+  nlp_model: all-MiniLM-L6-v2
+  nlp_weight: 0.4
+  cv_weight: 0.6
+  threshold: 0.70
+
+email:
+  server: smtp.gmail.com
+  port: 587
+  username: your-email@example.com
+  password: your-app-password
+  sender: MSU Lost and Found <your-email@example.com>

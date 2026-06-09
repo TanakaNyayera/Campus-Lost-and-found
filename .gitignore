@@ -1,0 +1,32 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+config/config.yaml
+config/*.local.yaml
+venv/
+venv*/
+.venv/
+*.log
+.ipynb_checkpoints/
+flask_*log
+wrapper_test.log
+.pytest_cache/
+.sixth/
+.vscode/
+
+# Runtime uploads and generated user data
+data/raw/images/
+data/raw/*.csv
+logs/
+
+# Generated feature artifacts can be regenerated locally
+data/processed/*.pkl
+data/processed/*.csv
+
+# Temporary local checks
+tmp_*.py
+TODO.md
+check_lan_access.ps1
+fix_lan_firewall_rules.ps1
+TROUBLESHOOT_LAN_ACCESS.md

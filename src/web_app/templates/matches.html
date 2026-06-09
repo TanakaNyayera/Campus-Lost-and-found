@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}My Matches — MSU Lost & Found{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>My Matches</h1>
+    <p>All matches found by the AI for your reported items.</p>
+</div>
+
+{% if matches %}
+{% for match in matches %}
+<div class="card">
+    <div class="grid-2">
+        <div>
+            <p style="font-size:0.75rem; text-transform:uppercase; color:#888; font-weight:600; margin-bottom:8px;">Lost Item</p>
+            <h3 style="color:var(--navy); font-family:'Playfair Display',serif;">{{ match.lost_name }}</h3>
+            <p style="color:#666; font-size:0.9rem; margin-top:6px;">{{ match.lost_desc }}</p>
+            {% if match.lost_image %}
+            <img src="/uploaded/{{ match.lost_image }}"
+                alt="Lost item"
+                style="width:100%; max-height:180px; object-fit:cover; border-radius:10px; margin-top:12px;">
+            {% endif %}
+        </div>
+        <div>
+            <p style="font-size:0.75rem; text-transform:uppercase; color:#888; font-weight:600; margin-bottom:8px;">Found Item</p>
+            <h3 style="color:var(--navy); font-family:'Playfair Display',serif;">{{ match.found_name }}</h3>
+            <p style="color:#666; font-size:0.9rem; margin-top:6px;">{{ match.found_desc }}</p>
+            {% if match.found_image %}
+            <img src="/uploaded/{{ match.found_image }}"
+                alt="Found item"
+                style="width:100%; max-height:180px; object-fit:cover; border-radius:10px; margin-top:12px;">
+            {% endif %}
+        </div>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-top:20px; padding-top:16px; border-top:1px solid #eef0f5;">
+        <div style="display:flex; gap:20px;">
+            <div>
+                <small style="color:#888;">NLP Score</small>
+                <div style="font-weight:600; color:var(--navy);">{{ "%.1f"|format(match.nlp_score * 100) }}%</div>
+            </div>
+            <div>
+                <small style="color:#888;">CV Score</small>
+                <div style="font-weight:600; color:var(--navy);">{{ "%.1f"|format(match.cv_score * 100) }}%</div>
+            </div>
+            <div>
+                <small style="color:#888;">Match Confidence</small>
+                <div style="font-weight:700; color:var(--success); font-size:1.1rem;">{{ "%.1f"|format(match.hybrid_score * 100) }}%</div>
+            </div>
+            <div>
+                <small style="color:#888;">Status</small>
+                <div>
+                    <span class="badge badge-{{ 'success' if match.status == 'confirmed' else 'warning' }}">
+                        {{ match.status.title() }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        <a href="/claim/{{ match.id }}" class="btn btn-gold">Claim This Item</a>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="card" style="text-align:center; padding:60px;">
+    <div style="font-size:4rem; margin-bottom:16px;">🔍</div>
+    <h3 style="font-family:'Playfair Display',serif; color:var(--navy); margin-bottom:10px;">No Matches Yet</h3>
+    <p style="color:#666; margin-bottom:24px;">Report a lost or found item and our AI will search for matches automatically.</p>
+    <a href="/report_lost" class="btn btn-primary">Report Lost Item</a>
+    &nbsp;
+    <a href="/report_found" class="btn btn-gold">Report Found Item</a>
+</div>
+{% endif %}
+{% endblock %}

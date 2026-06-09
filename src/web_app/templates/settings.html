@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% block title %}Settings - MSU Lost & Found{% endblock %}
+{% block extra_css %}
+<style>
+    .settings-layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 24px;
+        align-items: start;
+    }
+    .settings-nav {
+        position: sticky;
+        top: 88px;
+    }
+    .settings-nav a {
+        display: block;
+        padding: 10px 12px;
+        margin-bottom: 6px;
+        border-radius: 8px;
+        color: var(--navy);
+        text-decoration: none;
+        font-weight: 700;
+        background: #f7f9fc;
+    }
+    .settings-nav a:hover { background: #edf3fb; }
+    .setting-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 12px 0;
+        border-bottom: 1px solid #eef0f5;
+    }
+    .setting-row:last-child { border-bottom: 0; }
+    .setting-copy strong { color: var(--navy); display: block; }
+    .setting-copy small { color: #666; }
+    .switch-input { width: 18px; height: 18px; }
+    .inline-form {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .inline-form .form-control { width: auto; min-width: 130px; padding: 8px 10px; }
+    .table-wrap { overflow-x: auto; }
+    @media (max-width: 900px) {
+        .settings-layout { grid-template-columns: 1fr; }
+        .settings-nav { position: static; }
+    }
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>Settings</h1>
+    <p>Manage account preferences, notifications, security, and admin controls.</p>
+</div>
+
+<div class="settings-layout">
+    <div class="card settings-nav">
+        <a href="#general">General</a>
+        <a href="#notifications">Notifications</a>
+        {% if session.role == 'admin' %}
+        <a href="#reports">Report Management</a>
+        {% endif %}
+        <a href="#security">Security</a>
+        <a href="#appearance">Appearance</a>
+        {% if session.role == 'admin' %}
+        <a href="#users">User Management</a>
+        <a href="#activity">Activity Logs</a>
+        {% endif %}
+    </div>
+
+    <div>
+        <section id="general" class="card">
+            <h2 class="card-title">General</h2>
+            <form method="POST">
+                <input type="hidden" name="section" value="general">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Reg Number</label>
+                        <input class="form-control" name="student_id" value="{{ user.student_id or '' }}" placeholder="e.g. R235678A">
+                    </div>
+                    <div class="form-group">
+                        <label>Support Phone</label>
+                        <input class="form-control" name="support_phone" value="{{ app_settings.support_phone }}" {% if session.role != 'admin' %}readonly{% endif %}>
+                    </div>
+                </div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Your Phone</label>
+                        <input class="form-control" name="phone" value="{{ user.phone or '' }}" placeholder="+263 ...">
+                    </div>
+                    <div class="form-group">
+                        <label>Default Language</label>
+                        <select class="form-control" name="default_language" {% if session.role != 'admin' %}disabled{% endif %}>
+                            {% for lang in ['English', 'Shona', 'Ndebele'] %}
+                            <option value="{{ lang }}" {% if app_settings.default_language == lang %}selected{% endif %}>{{ lang }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Time Zone</label>
+                        <select class="form-control" name="time_zone" {% if session.role != 'admin' %}disabled{% endif %}>
+                            {% for tz in ['Africa/Johannesburg', 'Africa/Harare', 'UTC'] %}
+                            <option value="{{ tz }}" {% if app_settings.time_zone == tz %}selected{% endif %}>{{ tz }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Save General Settings</button>
+            </form>
+        </section>
+
+        <section id="notifications" class="card">
+            <h2 class="card-title">Notifications</h2>
+            <form method="POST">
+                <input type="hidden" name="section" value="notifications">
+                <label class="setting-row">
+                    <span class="setting-copy"><strong>Email Notifications</strong><small>Receive important updates by email.</small></span>
+                    <input class="switch-input" type="checkbox" name="email_notifications" {% if prefs.email_notifications %}checked{% endif %}>
+                </label>
+                <label class="setting-row">
+                    <span class="setting-copy"><strong>Match Alerts</strong><small>Notify when a likely item match is found.</small></span>
+                    <input class="switch-input" type="checkbox" name="match_alerts" {% if prefs.match_alerts %}checked{% endif %}>
+                </label>
+                {% if session.role == 'admin' %}
+                <label class="setting-row">
+                    <span class="setting-copy"><strong>Admin Alerts</strong><small>Notify admins about new lost reports and claims.</small></span>
+                    <input class="switch-input" type="checkbox" name="admin_alerts" {% if app_settings.admin_alerts == '1' %}checked{% endif %}>
+                </label>
+                {% endif %}
+                <label class="setting-row">
+                    <span class="setting-copy"><strong>Report Status Updates</strong><small>Receive updates when claims or handling status changes.</small></span>
+                    <input class="switch-input" type="checkbox" name="report_status_updates" {% if prefs.report_status_updates %}checked{% endif %}>
+                </label>
+                <label class="setting-row">
+                    <span class="setting-copy"><strong>Sound Notifications</strong><small>Enable sound cues for demo interactions.</small></span>
+                    <input class="switch-input" type="checkbox" name="sound_notifications" {% if prefs.sound_notifications %}checked{% endif %}>
+                </label>
+                <button class="btn btn-primary" type="submit" style="margin-top:18px;">Save Notification Settings</button>
+            </form>
+        </section>
+
+        {% if session.role == 'admin' %}
+        <section id="reports" class="card">
+            <h2 class="card-title">Report Management</h2>
+            <form method="POST">
+                <input type="hidden" name="section" value="reports">
+                <label class="setting-row">
+                    <span class="setting-copy"><strong>Archive Resolved Reports</strong><small>Keep matched or completed reports out of active views.</small></span>
+                    <input class="switch-input" type="checkbox" name="archive_resolved_reports" {% if app_settings.archive_resolved_reports == '1' %}checked{% endif %}>
+                </label>
+                <label class="setting-row">
+                    <span class="setting-copy"><strong>Auto Delete Old Reports</strong><small>Prepare cleanup for old unresolved demo data.</small></span>
+                    <input class="switch-input" type="checkbox" name="auto_delete_old_reports" {% if app_settings.auto_delete_old_reports == '1' %}checked{% endif %}>
+                </label>
+                <div class="grid-3" style="margin-top:18px;">
+                    <div class="form-group">
+                        <label>Maximum Image Upload Size</label>
+                        <input class="form-control" type="number" min="1" name="max_image_upload_size_mb" value="{{ app_settings.max_image_upload_size_mb }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Allowed File Types</label>
+                        <input class="form-control" name="allowed_file_types" value="{{ app_settings.allowed_file_types }}">
+                    </div>
+                    <label class="setting-row" style="border-bottom:0;">
+                        <span class="setting-copy"><strong>Anonymous Reporting</strong><small>Allow reports without signed-in ownership.</small></span>
+                        <input class="switch-input" type="checkbox" name="enable_anonymous_reporting" {% if app_settings.enable_anonymous_reporting == '1' %}checked{% endif %}>
+                    </label>
+                </div>
+                <button class="btn btn-primary" type="submit">Save Report Settings</button>
+            </form>
+        </section>
+        {% endif %}
+
+        <section id="security" class="card">
+            <h2 class="card-title">Security</h2>
+            <form method="POST">
+                <input type="hidden" name="section" value="security">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Current Password</label>
+                        <input class="form-control" type="password" name="current_password" placeholder="Required only when changing password">
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input class="form-control" type="password" name="new_password" placeholder="Leave blank to keep current password">
+                    </div>
+                </div>
+                <label class="setting-row">
+                    <span class="setting-copy"><strong>2-Factor Authentication</strong><small>Demo toggle for future verification flow.</small></span>
+                    <input class="switch-input" type="checkbox" name="two_factor_enabled" {% if prefs.two_factor_enabled %}checked{% endif %}>
+                </label>
+                {% if session.role == 'admin' %}
+                <div class="grid-2" style="margin-top:18px;">
+                    <div class="form-group">
+                        <label>Session Timeout</label>
+                        <input class="form-control" type="number" min="5" name="session_timeout_minutes" value="{{ app_settings.session_timeout_minutes }}">
+                    </div>
+                    <div class="form-group">
+                        <label>Login Attempt Limit</label>
+                        <input class="form-control" type="number" min="1" name="login_attempt_limit" value="{{ app_settings.login_attempt_limit }}">
+                    </div>
+                </div>
+                {% endif %}
+                <button class="btn btn-primary" type="submit">Save Security Settings</button>
+            </form>
+        </section>
+
+        <section id="appearance" class="card">
+            <h2 class="card-title">Appearance</h2>
+            <form method="POST">
+                <input type="hidden" name="section" value="appearance">
+                <label class="setting-row">
+                    <span class="setting-copy"><strong>Dark Mode</strong><small>Switch the interface to a darker presentation style.</small></span>
+                    <input class="switch-input" type="checkbox" name="dark_mode" {% if prefs.dark_mode %}checked{% endif %}>
+                </label>
+                <div class="form-group" style="margin-top:18px;">
+                    <label>Theme Color</label>
+                    <input class="form-control" type="color" name="theme_color" value="{{ prefs.theme_color or '#003366' }}" style="width:90px; padding:6px;">
+                </div>
+                <button class="btn btn-primary" type="submit">Save Appearance</button>
+            </form>
+        </section>
+
+        {% if session.role == 'admin' %}
+        <section id="users" class="card">
+            <h2 class="card-title">User Management</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Reg Number</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Last Active</th>
+                            <th>Controls</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for managed_user in users %}
+                        <tr>
+                            <td><strong>{{ managed_user.full_name }}</strong><br><small>{{ managed_user.email }}</small></td>
+                            <td>{{ managed_user.student_id or 'N/A' }}</td>
+                            <td>{{ managed_user.role }}</td>
+                            <td>
+                                <span class="badge badge-{{ 'danger' if managed_user.suspended else 'success' }}">
+                                    {{ 'Suspended' if managed_user.suspended else 'Active' }}
+                                </span>
+                            </td>
+                            <td>{{ managed_user.last_seen or 'No activity yet' }}</td>
+                            <td>
+                                <form class="inline-form" method="POST" action="/settings/users">
+                                    <input type="hidden" name="user_id" value="{{ managed_user.id }}">
+                                    <select class="form-control" name="role">
+                                        <option value="student" {% if managed_user.role == 'student' %}selected{% endif %}>Student</option>
+                                        <option value="admin" {% if managed_user.role == 'admin' %}selected{% endif %}>Admin</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-primary" name="action" value="assign_role" type="submit">Role</button>
+                                    {% if managed_user.suspended %}
+                                    <button class="btn btn-sm btn-success" name="action" value="activate" type="submit">Activate</button>
+                                    {% else %}
+                                    <button class="btn btn-sm btn-gold" name="action" value="suspend" type="submit">Suspend</button>
+                                    {% endif %}
+                                    <input class="form-control" name="reset_password" type="text" placeholder="Temp password">
+                                    <button class="btn btn-sm btn-primary" name="action" value="reset_password" type="submit">Reset</button>
+                                    {% if managed_user.id != session.user_id %}
+                                    <button class="btn btn-sm btn-danger" name="action" value="remove" type="submit">Remove</button>
+                                    {% endif %}
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="activity" class="card">
+            <h2 class="card-title">Activity Logs</h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Action</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in activity_logs %}
+                        <tr>
+                            <td>{{ log.created_at }}</td>
+                            <td>{{ log.email }}</td>
+                            <td>{{ log.role or 'N/A' }}</td>
+                            <td>{{ log.action }}</td>
+                            <td>{{ log.ip_address or 'N/A' }}</td>
+                        </tr>
+                        {% else %}
+                        <tr><td colspan="5">No activity recorded yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
